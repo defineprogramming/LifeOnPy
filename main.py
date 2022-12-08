@@ -1,114 +1,114 @@
-# THIS IS A PRE-RELEASE BUILD. Build 218.
+# THIS IS A PRE-RELEASE VERSION. BUILD 3
 
+# Import necessary modules
 import random
-import os
+import pickle
 
-
-class Character:
-
-  def __init__(self):
-    self.age = 0
-    self.health = 100
-    self.wealth = 100
-    self.food_and_water_count = 0
-    self.exercise_count = 0
-    self.actions_count = 0
-    self.age_description = "Newborn - 0-12 months"
-    self.prev_age_description = "Newborn - 0-12 months"
-    self.real_age = 0
-
-  def eat(self):
-    self.health = min(100, self.health + 10)
-    self.food_and_water_count += 1
-    self.actions_count += 1
-    self.check_age_up()
-    return self
-
-  def drink(self):
-    self.health = min(100, self.health + 5)
-    self.food_and_water_count += 1
-    self.actions_count += 1
-    self.check_age_up()
-    return self
-
-  def exercise(self):
-    self.health = min(100, self.health + 5)
-    self.food_and_water_count += 1
-    self.actions_count += 1
-    self.check_age_up()
-    return self
-
-  def age_up(self):
-    self.prev_age_description = self.age_description
-    self.age += 1
-    self.health = 0 if self.food_and_water_count == 0 else max(
-      0, self.health - 50) if self.food_and_water_count < 3 else self.health
-
-    self.real_age = self.age
-
-    if self.age == 0:
-      self.age_description = "Newborn - 0-12 months"
-    elif self.age >= 1:
-      self.age_description = "Child - 1-13 years"
-    elif self.age >= 13 and self.age <= 24:
-      self.age_description = "Adolescent - 14-24 years"
-    elif self.age >= 25 and self.age <= 64:
-      self.age_description = "Adult - 25-65 years"
-    elif self.age >= 65:
-      self.age_description = "Elderly - 65+ years"
-
-    return self
-
-  def check_age_up(self):
-    if self.actions_count % 5 == 0:
-      self.age_up()
-    return self
-
-  def get_death_probability(self):
-    return 0.96**(self.age / 100)
-
-  def check_death(self):
-    if self.get_death_probability() > random.uniform(0, 1):
-      self.health = 0
-    return self
-
-
-class Game:
-
-  def __init__(self):
-    self.character = Character()
-
-  def process_command(self, command):
-    if command == "eat":
-      self.character.eat()
-    elif command == "drink":
-      self.character.drink()
-    elif command == "exercise":
-      self.character.exercise()
-    elif command == "age_up":
-      self.character.age_up()
+# Define a class to represent the user
+class User:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+        self.health = 100 # Starting health
+        self.money = 0 # Starting money
+        self.items = [] # Starting items
+        
+    # Method to simulate the passage of time
+    def time_passes(self):
+        self.age += 1 # Increase the user's age by 1
+        
+        # Randomly generate an event for the user based on their age
+        if self.age <= 5:
+            # Young child events
+            events = ["goes to school", "plays with friends", "learns to read"]
+            print(self.name + " " + random.choice(events))
+        elif self.age <= 18:
+            # Teenager events
+            events = ["goes to high school", "gets a part-time job", "gets their driver's license"]
+            print(self.name + " " + random.choice(events))
+        else:
+            # Adult events
+            events = ["starts a career", "gets married", "has a child"]
+            print(self.name + " " + random.choice(events))
+            
+        # Randomly generate a financial event for the user
+        if random.random() < 0.5:
+            # 50% chance of earning money
+            self.money += random.randint(100, 500)
+            print(self.name + " earns $" + str(self.money) + ".")
+        else:
+            # 50% chance of losing money
+            self.money -= random.randint(100, 500)
+            if self.money < 0:
+                self.money = 0
+            print(self.name + " loses $" + str(self.money) + ".")
+            
+    # Method to simulate illness and injury
+    def get_sick(self):
+        self.health -= random.randint(10, 30) # Decrease health by a random amount
+        
+        # Check if the user's health is below 0, indicating death
+        if self.health <= 0:
+            print(self.name + " has died.")
+        else:
+            print(self.name + " is feeling sick and their health has decreased.")
+        
+    # Method to simulate visiting a doctor
+    def visit_doctor(self):
+        # Check if the user has enough money to pay for a doctor's visit
+        if self.money >= 50:
+            self.money -= 50 # Pay for the doctor's visit
+            self.health += 20 # Increase the user's health
+            
+            # Check if the user's health is above 100, indicating full recovery
+            if self.health > 100:
+                self.health = 100 # Set the user's health to 100
+                print(self.name + " is now fully recovered.")
+            else:
+                print(self.name + " visits a doctor and their health improves.")
+    
+    # Method to simulate shopping
+    def shop(self):
+    # Generate a list of items for the user to choose from
+    items = ["food", "clothes", "toys", "books"]
+    
+    # Print the available items and their prices
+    print("Available items:")
+    for item in items:
+        print("- " + item + ": $" + str(random.randint(10, 100)))
+        
+    # Prompt the user to make a selection
+    print("Enter the name of the item you would like to purchase:")
+    selection = input()
+    
+    # Check if the user entered a valid item
+    if selection in items:
+        # Check if the user has enough money to purchase the item
+        item_price = random.randint(10, 100)
+        if self.money >= item_price:
+            # Add the item to the user's list of items
+            self.items.append(selection)
+            self.money -= item_price # Deduct the cost of the item from the user's money
+            print(self.name + " purchases a " + selection + " for $" + str(item_price) + ".")
+        else:
+            print(self.name + " does not have enough money to purchase a " + selection + ".")
     else:
-      print("Invalid command.")
+        print(self.name + " did not enter a valid item.")
 
+# Method to save the user's data
+def save_data(self):
+    # Serialize the user's data using pickle
+    data = pickle.dumps(self)
+    
+    # Write the serialized data to a file
+    with open("user_data.pkl", "wb") as f:
+        f.write(data)
 
-game = Game()
-
-while True:
-  if game.character.health <= 0:
-    os.system("clear")
-    print("You have died.")
-
-    response = input("Would you like to restart? (y/n)")
-    if response.lower() == "y":
-      game = Game()
-    else:
-      break
-
-  command = input("Enter a command: ")
-  game.process_command(command)
-
-  print(f"Age: {game.character.age_description}")
-  print(f"Real Age: {game.character.real_age}")
-  print(f"Previous Age: {game.character.prev_age_description}")
-  print(f"Health: {game.character.health}")
-  print(f"Wealth: {game.character.wealth}")
+# Method to restore the user's data
+def restore_data(self):
+    # Read the serialized data from the file
+    with open("user_data.pkl", "rb") as f:
+        data = f.read()
+    
+    # Deserialize the data using pickle
+    self = pickle.loads(data)
